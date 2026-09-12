@@ -1,5 +1,5 @@
 using System;
-using MystiLink.Bazi;
+using Mystilink.Bazi;
 
 class Program
 {

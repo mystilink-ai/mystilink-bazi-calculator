@@ -65,5 +65,5 @@ function createBaziApi(runCli) {
 module.exports = { createBaziApi };
 
 if (typeof window !== 'undefined') {
-  window.MystiLinkBazi = { createBaziApi };
+  window.MystilinkBazi = { createBaziApi };
 }

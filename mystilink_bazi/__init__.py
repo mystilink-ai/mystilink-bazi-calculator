@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""MystiLink BaZi calculator: four pillars, dayun, and liunian."""
+"""Mystilink BaZi calculator: four pillars, dayun, and liunian."""
 
 from mystilink_bazi.calculate import compute_bazi, parse_date, resolve_birth_datetime
 from mystilink_bazi.dayun import compute_dayun

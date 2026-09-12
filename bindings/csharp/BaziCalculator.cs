@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text;
 
-namespace MystiLink.Bazi
+namespace Mystilink.Bazi
 {
     /// <summary>
     /// Invokes the mystilink-bazi CLI and returns JSON stdout.

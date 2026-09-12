@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""CLI for MystiLink BaZi calculator. Prints JSON to stdout on success."""
+"""CLI for Mystilink BaZi calculator. Prints JSON to stdout on success."""
 from __future__ import annotations
 
 import argparse

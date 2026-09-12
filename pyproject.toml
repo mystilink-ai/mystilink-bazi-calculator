@@ -9,7 +9,7 @@ description = "BaZi (Four Pillars) calculator with dayun and liunian JSON CLI"
 readme = "README.md"
 license = { text = "MIT" }
 requires-python = ">=3.9"
-authors = [{ name = "MystiLink" }]
+authors = [{ name = "Mystilink" }]
 keywords = ["bazi", "four-pillars", "calendar", "cli"]
 classifiers = [
   "License :: OSI Approved :: MIT License",

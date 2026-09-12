@@ -3,10 +3,10 @@
     <TargetFramework>net6.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <RootNamespace>MystiLink.Bazi</RootNamespace>
-    <AssemblyName>MystiLink.Bazi</AssemblyName>
+    <RootNamespace>Mystilink.Bazi</RootNamespace>
+    <AssemblyName>Mystilink.Bazi</AssemblyName>
     <Version>0.1.0</Version>
-    <Authors>MystiLink</Authors>
+    <Authors>Mystilink</Authors>
     <Description>BaZi calculator CLI binding</Description>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
   </PropertyGroup>

@@ -6,6 +6,6 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
   <ItemGroup>
-    <ProjectReference Include="../../bindings/csharp/MystiLink.Bazi.csproj" />
+    <ProjectReference Include="../../bindings/csharp/Mystilink.Bazi.csproj" />
   </ItemGroup>
 </Project>

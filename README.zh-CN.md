@@ -1,4 +1,4 @@
-# MystiLink 八字计算器
+# Mystilink 八字计算器
 
 > Languages: [English](README.md) | [简体中文](README.zh-CN.md)
 
