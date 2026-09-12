@@ -1,0 +1,30 @@
+{
+  "name": "@mystilink/bazi-calculator",
+  "version": "0.1.0",
+  "description": "BaZi calculator binding that invokes mystilink-bazi CLI",
+  "license": "MIT",
+  "main": "index.js",
+  "browser": "browser.js",
+  "exports": {
+    ".": {
+      "node": "./index.js",
+      "browser": "./browser.js",
+      "default": "./index.js"
+    },
+    "./browser": "./browser.js"
+  },
+  "files": [
+    "index.js",
+    "browser.js",
+    "cli.js",
+    "README.md"
+  ],
+  "engines": {
+    "node": ">=16"
+  },
+  "keywords": [
+    "bazi",
+    "four-pillars",
+    "cli"
+  ]
+}

@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <RootNamespace>MystiLink.Bazi</RootNamespace>
+    <AssemblyName>MystiLink.Bazi</AssemblyName>
+    <Version>0.1.0</Version>
+    <Authors>MystiLink</Authors>
+    <Description>BaZi calculator CLI binding</Description>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+  </PropertyGroup>
+</Project>

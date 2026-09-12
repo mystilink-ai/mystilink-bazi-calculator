@@ -1,0 +1,13 @@
+{
+  "title": "BaZi Liunian Input",
+  "type": "object",
+  "required": ["year"],
+  "properties": {
+    "year": { "type": "integer" },
+    "day_stem": { "type": "string" },
+    "pillars": {
+      "type": "object",
+      "description": "Optional original four pillars for interaction hints"
+    }
+  }
+}

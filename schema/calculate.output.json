@@ -1,0 +1,40 @@
+{
+  "title": "BaZi Calculate Output",
+  "type": "object",
+  "required": ["bazi_schema_version", "pillars", "bazi_ganzhi"],
+  "properties": {
+    "bazi_schema_version": { "type": "string" },
+    "birth_date": { "type": "string" },
+    "hour_interval": { "type": "integer" },
+    "effective_hour": { "type": "integer" },
+    "effective_minute": { "type": "integer" },
+    "true_solar_time_enabled": { "type": "boolean" },
+    "true_solar_time_delta_minutes": { "type": "number" },
+    "pillars": {
+      "type": "object",
+      "properties": {
+        "year": { "$ref": "#/$defs/pillar" },
+        "month": { "$ref": "#/$defs/pillar" },
+        "day": { "$ref": "#/$defs/pillar" },
+        "hour": { "$ref": "#/$defs/pillar" }
+      }
+    },
+    "bazi_ganzhi": { "type": "string" },
+    "summary_zh": { "type": "string" },
+    "bazi_grid_cells": { "type": "array" },
+    "bazi_details": { "type": "array" }
+  },
+  "$defs": {
+    "pillar": {
+      "type": "object",
+      "properties": {
+        "stem": { "type": "string" },
+        "branch": { "type": "string" },
+        "ganzhi": { "type": "string" },
+        "stem_element": { "type": "string" },
+        "branch_element": { "type": "string" },
+        "zodiac": { "type": "string" }
+      }
+    }
+  }
+}

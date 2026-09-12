@@ -1,0 +1,10 @@
+{
+  "title": "BaZi Dayun Input",
+  "type": "object",
+  "required": ["date", "gender"],
+  "properties": {
+    "date": { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$" },
+    "gender": { "type": "string", "enum": ["male", "female"] },
+    "count": { "type": "integer", "minimum": 1, "default": 8 }
+  }
+}

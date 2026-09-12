@@ -1,0 +1,8 @@
+{
+  "description": "Fictional sample birth used in README and examples",
+  "date": "1990-05-15",
+  "hour": 12,
+  "minute": 0,
+  "gender": "male",
+  "liunian_year": 2024
+}
