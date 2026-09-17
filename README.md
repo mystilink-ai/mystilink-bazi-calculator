@@ -45,6 +45,7 @@ Always prints JSON to stdout on success.
 
 ```bash
 mystilink-bazi calculate --date YYYY-MM-DD [--hour N] [--minute N] [--timezone IANA] [--longitude N]
+mystilink-bazi calculate --birth-json path/or/-/inline.json
 mystilink-bazi dayun --date YYYY-MM-DD --gender male|female [--count N]
 mystilink-bazi liunian --year YYYY [--day-stem STEM] [--pillars-json JSON]
 mystilink-bazi version
@@ -54,13 +55,16 @@ mystilink-bazi version
 
 | Option | Description |
 |--------|-------------|
-| `--date` | Birth date `YYYY-MM-DD` (required) |
+| `--date` | Birth date `YYYY-MM-DD` (required unless `--birth-json`) |
 | `--hour` | Birth hour `0-23` (default `11` if omitted) |
 | `--minute` | Birth minute `0-59` (default `0`) |
-| `--timezone` | IANA timezone for true solar time (e.g. `Asia/Shanghai`) |
+| `--timezone` | IANA timezone (true solar time / optional `birth` block) |
 | `--longitude` | Longitude in degrees, east positive |
+| `--birth-json` | BirthProfile (`mystilink.birth/0.1`): file path, `-` (stdin), or inline JSON |
 
-True solar time applies only when both `--timezone` and `--longitude` are set.
+True solar time applies only when both `--timezone` and `--longitude` are set (legacy CLI), or when BirthProfile sets `birth.true_solar_time` **and** timezone/longitude are available.
+
+Each pillar includes `stem_index`, `branch_index`, `text`, plus legacy `stem` / `branch` / `ganzhi` (`ganzhi` equals `text`). Top-level `schema_version` is `mystilink.bazi.chart/0.1`; `bazi_schema_version` remains `1.0` for older consumers.
 
 ### dayun
 
@@ -89,17 +93,29 @@ dayun = compute_dayun(date(1990, 5, 15), "male", count=8)
 liunian = compute_liunian(2024, day_stem=pillars["pillars"]["day"]["stem"])
 ```
 
+## Compatibility
+
+- Install alone: no hard dependency on `mystilink-lunar` or metaphysics-schema packages.
+- Contract alignment: output fields match `mystilink.bazi.chart/0.1` / Ganzhi shapes; BirthProfile input matches `mystilink.birth/0.1` by field convention only.
+- `calendar_engine` is currently always `builtin`. Optional lunar / external calendar basis is reserved for a later release.
+- See [CHANGELOG.md](CHANGELOG.md).
+
 ## Examples
 
 Runnable samples live under `examples/{c,cpp,csharp,java,js,node,python}/`. Binding sources live under `bindings/`.
 
-Schemas for CLI JSON shapes are in `schema/`.
+Schemas for CLI JSON shapes are in `schema/`. Sample BirthProfile: `tests/fixtures/birth.profile.v0.json`.
+
+```bash
+mystilink-bazi calculate --birth-json tests/fixtures/birth.profile.v0.json
+```
 
 ## Limits
 
 - Solar-term dates for DaYun start-age use approximate civil calendar days, not ephemeris precision.
 - True solar time uses Equation of Time plus longitude; accuracy depends on timezone and longitude inputs.
 - This package does not ship fonts, images, or remote asset lookups.
+- Built-in calendar rules are approximate; they are not a substitute for a dedicated lunar/ephemeris library.
 
 ## License
 

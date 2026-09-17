@@ -6,14 +6,16 @@ import argparse
 import json
 import sys
 from importlib.metadata import PackageNotFoundError, version
-from typing import Any, List, Optional
+from pathlib import Path
+from typing import Any, Dict, List, Optional, Tuple
 
+from mystilink_bazi.birth import BirthProfileError, parse_birth_profile
 from mystilink_bazi.calculate import compute_bazi, parse_date, resolve_birth_datetime
 from mystilink_bazi.dayun import compute_dayun
 from mystilink_bazi.liunian import compute_liunian
 
 PACKAGE_NAME = "mystilink-bazi-calculator"
-FALLBACK_VERSION = "0.1.0"
+FALLBACK_VERSION = "0.2.0"
 
 
 def get_version() -> str:
@@ -32,26 +34,86 @@ def _print_error(message: str, code: int = 1) -> None:
     raise SystemExit(code)
 
 
-def cmd_calculate(args: argparse.Namespace) -> None:
+def _load_json_arg(raw: str) -> Dict[str, Any]:
+    """Load JSON from a file path, '-' (stdin), or an inline JSON string."""
+    text: str
+    if raw == "-":
+        text = sys.stdin.read()
+    else:
+        path = Path(raw)
+        if path.is_file():
+            text = path.read_text(encoding="utf-8")
+        else:
+            text = raw
     try:
-        birth = parse_date(args.date)
+        data = json.loads(text)
+    except json.JSONDecodeError as exc:
+        raise ValueError(f"invalid JSON: {exc}") from exc
+    if not isinstance(data, dict):
+        raise ValueError("JSON root must be an object")
+    return data
+
+
+def _resolve_calculate_inputs(
+    args: argparse.Namespace,
+) -> Tuple[Any, int, int, Optional[str], Optional[float], bool]:
+    """
+    Return (birth_date, hour, minute, timezone, longitude, prefer_true_solar).
+
+    BirthProfile (--birth-json) takes precedence for civil time; CLI flags may
+    still override timezone/longitude when explicitly set.
+    """
+    prefer_true_solar = False
+    timezone: Optional[str] = args.timezone
+    longitude: Optional[float] = args.longitude
+
+    if args.birth_json:
+        try:
+            profile = _load_json_arg(args.birth_json)
+            civil, hour, minute, tz, lon = parse_birth_profile(profile)
+        except (BirthProfileError, ValueError, OSError) as exc:
+            _print_error(str(exc))
+        if timezone is None:
+            timezone = tz
+        if longitude is None:
+            longitude = lon
+        birth_block = profile.get("birth") if isinstance(profile.get("birth"), dict) else {}
+        prefer_true_solar = bool(birth_block.get("true_solar_time"))
+        return civil, hour, minute, timezone, longitude, prefer_true_solar
+
+    if not args.date:
+        _print_error("either --date or --birth-json is required")
+
+    try:
+        civil = parse_date(args.date)
     except Exception as exc:
         _print_error(str(exc))
 
     if args.hour is not None:
-        hi = max(0, min(23, args.hour))
+        hour = max(0, min(23, args.hour))
     elif args.hour_interval is not None:
-        hi = max(0, min(23, args.hour_interval))
+        hour = max(0, min(23, args.hour_interval))
     else:
-        hi = 11
-    mi = max(0, min(59, args.minute))
+        hour = 11
+    minute = max(0, min(59, args.minute))
+    return civil, hour, minute, timezone, longitude, prefer_true_solar
+
+
+def cmd_calculate(args: argparse.Namespace) -> None:
+    birth, hi, mi, timezone, longitude, prefer_true_solar = _resolve_calculate_inputs(args)
 
     tst_enabled = False
     tst_delta = 0.0
-    if args.timezone is not None and args.longitude is not None:
+    if args.birth_json:
+        # BirthProfile: only when true_solar_time is explicitly requested
+        apply_tst = prefer_true_solar and timezone is not None and longitude is not None
+    else:
+        # Legacy CLI: both flags imply true solar time
+        apply_tst = timezone is not None and longitude is not None
+    if apply_tst:
         try:
             birth, hi, mi, tst_enabled, tst_delta = resolve_birth_datetime(
-                birth, hi, mi, args.timezone, args.longitude
+                birth, hi, mi, timezone, longitude  # type: ignore[arg-type]
             )
         except Exception as exc:
             print(
@@ -61,6 +123,19 @@ def cmd_calculate(args: argparse.Namespace) -> None:
                 ),
                 file=sys.stderr,
             )
+    elif prefer_true_solar and (timezone is None or longitude is None):
+        print(
+            json.dumps(
+                {
+                    "warning": (
+                        "true_solar_time requested but timezone/longitude missing; "
+                        "using clock time"
+                    )
+                },
+                ensure_ascii=False,
+            ),
+            file=sys.stderr,
+        )
 
     out = compute_bazi(
         birth,
@@ -68,6 +143,8 @@ def cmd_calculate(args: argparse.Namespace) -> None:
         mi,
         true_solar_enabled=tst_enabled,
         true_solar_delta_minutes=tst_delta,
+        timezone=timezone,
+        calendar_engine="builtin",
     )
     _print_json(out)
 
@@ -104,7 +181,12 @@ def build_parser() -> argparse.ArgumentParser:
     sub = parser.add_subparsers(dest="command", required=True)
 
     p_calc = sub.add_parser("calculate", help="Compute four pillars")
-    p_calc.add_argument("--date", required=True, help="Birth date YYYY-MM-DD")
+    p_calc.add_argument(
+        "--date",
+        required=False,
+        default=None,
+        help="Birth date YYYY-MM-DD (required unless --birth-json)",
+    )
     p_calc.add_argument("--hour", type=int, default=None, help="Birth hour 0-23")
     p_calc.add_argument(
         "--hour-interval",
@@ -124,6 +206,15 @@ def build_parser() -> argparse.ArgumentParser:
         type=float,
         default=None,
         help="Longitude in degrees (east positive) for true solar time",
+    )
+    p_calc.add_argument(
+        "--birth-json",
+        type=str,
+        default=None,
+        help=(
+            "BirthProfile JSON (mystilink.birth/0.1): file path, '-' for stdin, "
+            "or inline JSON. Overrides --date/--hour/--minute when set."
+        ),
     )
     p_calc.set_defaults(func=cmd_calculate)
 

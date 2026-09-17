@@ -1,12 +1,39 @@
 {
   "title": "BaZi Calculate Input",
   "type": "object",
-  "required": ["date"],
+  "description": "Either legacy date/hour fields or a BirthProfile document (mystilink.birth/0.1).",
   "properties": {
     "date": { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$" },
     "hour": { "type": "integer", "minimum": 0, "maximum": 23 },
     "minute": { "type": "integer", "minimum": 0, "maximum": 59 },
     "timezone": { "type": "string", "description": "IANA timezone name" },
-    "longitude": { "type": "number", "description": "Degrees, east positive" }
-  }
+    "longitude": { "type": "number", "description": "Degrees, east positive" },
+    "birth_profile": {
+      "type": "object",
+      "description": "Optional mystilink.birth/0.1 document (CLI --birth-json)",
+      "properties": {
+        "schema_version": { "type": "string", "const": "mystilink.birth/0.1" },
+        "birth": {
+          "type": "object",
+          "required": ["datetime", "timezone"],
+          "properties": {
+            "datetime": { "type": "string" },
+            "timezone": { "type": "string" },
+            "longitude": { "type": "number" },
+            "true_solar_time": { "type": "boolean" }
+          }
+        },
+        "place": {
+          "type": "object",
+          "properties": {
+            "lon": { "type": "number" }
+          }
+        }
+      }
+    }
+  },
+  "anyOf": [
+    { "required": ["date"] },
+    { "required": ["birth_profile"] }
+  ]
 }

@@ -119,10 +119,16 @@ class Pillar:
     branch: str
 
     def to_dict(self) -> Dict[str, Any]:
+        stem_index = _index_of(HEAVENLY_STEMS, self.stem)
+        branch_index = _index_of(EARTHLY_BRANCHES, self.branch)
+        text = self.stem + self.branch
         return {
+            "stem_index": stem_index,
+            "branch_index": branch_index,
             "stem": self.stem,
             "branch": self.branch,
-            "ganzhi": self.stem + self.branch,
+            "text": text,
+            "ganzhi": text,  # legacy alias of text
             "stem_element": STEM_ELEMENTS.get(self.stem),
             "branch_element": BRANCH_ELEMENTS.get(self.branch),
             "zodiac": ZODIAC_ANIMALS.get(self.branch),
@@ -228,6 +234,8 @@ def compute_bazi(
     *,
     true_solar_enabled: bool = False,
     true_solar_delta_minutes: float = 0.0,
+    timezone: Optional[str] = None,
+    calendar_engine: str = "builtin",
 ) -> Dict[str, Any]:
     """Compute four pillars from (possibly true-solar-corrected) date/hour/minute."""
     hi = hour_interval
@@ -272,8 +280,10 @@ def compute_bazi(
         hour_p.stem, hour_p.branch,
     ]
 
-    return {
-        "bazi_schema_version": "1.0",
+    out: Dict[str, Any] = {
+        "schema_version": "mystilink.bazi.chart/0.1",
+        "bazi_schema_version": "1.0",  # legacy
+        "calendar_engine": calendar_engine,
         "birth_date": birth_date.isoformat(),
         "hour_interval": hi,
         "effective_hour": hi,
@@ -300,6 +310,27 @@ def compute_bazi(
             {"item": "八字时柱-地支", "value": hour_p.branch},
         ],
     }
+    if timezone:
+        out["birth"] = {
+            "datetime": (
+                f"{birth_date.isoformat()}T{hi:02d}:{mi:02d}:00"
+            ),
+            "timezone": timezone,
+        }
+        # Prefer offset-aware ISO when timezone is known
+        try:
+            local = datetime(
+                birth_date.year,
+                birth_date.month,
+                birth_date.day,
+                hi,
+                mi,
+                tzinfo=ZoneInfo(timezone),
+            )
+            out["birth"]["datetime"] = local.isoformat()
+        except Exception:
+            pass
+    return out
 
 
 def resolve_birth_datetime(
