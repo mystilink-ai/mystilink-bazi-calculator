@@ -14,7 +14,11 @@
     "calendar_engine": {
       "type": "string",
       "enum": ["builtin", "lunar", "external_basis"],
-      "description": "0.2 always emits builtin; lunar/external_basis reserved for later"
+      "description": "builtin default; lunar needs optional extra; external_basis via --calendar-basis"
+    },
+    "calendar_basis": {
+      "type": "object",
+      "description": "Optional nested snapshot when calendar_engine is lunar or external_basis"
     },
     "birth_date": { "type": "string" },
     "hour_interval": { "type": "integer" },

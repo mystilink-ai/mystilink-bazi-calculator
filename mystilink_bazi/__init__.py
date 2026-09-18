@@ -3,17 +3,27 @@
 
 from mystilink_bazi.birth import BirthProfileError, parse_birth_profile
 from mystilink_bazi.calculate import compute_bazi, parse_date, resolve_birth_datetime
+from mystilink_bazi.calendar_engine import (
+    CalendarEngineError,
+    compute_bazi_from_calendar_basis,
+    compute_bazi_with_lunar,
+    lunar_available,
+)
 from mystilink_bazi.dayun import compute_dayun
 from mystilink_bazi.liunian import compute_liunian
 
 __all__ = [
     "BirthProfileError",
+    "CalendarEngineError",
     "compute_bazi",
+    "compute_bazi_from_calendar_basis",
+    "compute_bazi_with_lunar",
     "compute_dayun",
     "compute_liunian",
+    "lunar_available",
     "parse_birth_profile",
     "parse_date",
     "resolve_birth_datetime",
 ]
 
-__version__ = "0.2.0"
+__version__ = "0.2.1"

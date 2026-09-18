@@ -1,0 +1,53 @@
+{
+  "schema_version": "mystilink.calendar_basis/0.1",
+  "solar": {
+    "datetime": "1990-05-15T12:00:00+08:00",
+    "timezone": "Asia/Shanghai",
+    "year": 1990,
+    "month": 5,
+    "day": 15
+  },
+  "lunar": {
+    "year": 1990,
+    "month": 4,
+    "day": 21,
+    "is_leap_month": false
+  },
+  "ganzhi": {
+    "year": {
+      "stem_index": 6,
+      "branch_index": 6,
+      "stem": "庚",
+      "branch": "午",
+      "text": "庚午"
+    },
+    "month": {
+      "stem_index": 0,
+      "branch_index": 3,
+      "stem": "甲",
+      "branch": "卯",
+      "text": "甲卯"
+    },
+    "day": {
+      "stem_index": 2,
+      "branch_index": 2,
+      "stem": "丙",
+      "branch": "寅",
+      "text": "丙寅"
+    },
+    "hour": {
+      "stem_index": 6,
+      "branch_index": 6,
+      "stem": "庚",
+      "branch": "午",
+      "text": "庚午"
+    }
+  },
+  "rules": {
+    "year_boundary": "lichun_exact",
+    "month_boundary": "jie_exact",
+    "day_boundary": "zi_start",
+    "hour_system": "double_hour"
+  },
+  "provider": "fixture"
+}

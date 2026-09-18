@@ -11,11 +11,16 @@ from typing import Any, Dict, List, Optional, Tuple
 
 from mystilink_bazi.birth import BirthProfileError, parse_birth_profile
 from mystilink_bazi.calculate import compute_bazi, parse_date, resolve_birth_datetime
+from mystilink_bazi.calendar_engine import (
+    CalendarEngineError,
+    compute_bazi_from_calendar_basis,
+    compute_bazi_with_lunar,
+)
 from mystilink_bazi.dayun import compute_dayun
 from mystilink_bazi.liunian import compute_liunian
 
 PACKAGE_NAME = "mystilink-bazi-calculator"
-FALLBACK_VERSION = "0.2.0"
+FALLBACK_VERSION = "0.2.1"
 
 
 def get_version() -> str:
@@ -81,8 +86,12 @@ def _resolve_calculate_inputs(
         prefer_true_solar = bool(birth_block.get("true_solar_time"))
         return civil, hour, minute, timezone, longitude, prefer_true_solar
 
+    if not args.date and not args.calendar_basis:
+        _print_error("either --date, --birth-json, or --calendar-basis is required")
+
     if not args.date:
-        _print_error("either --date or --birth-json is required")
+        # calendar-basis may supply solar civil time later
+        return None, 11, 0, timezone, longitude, prefer_true_solar
 
     try:
         civil = parse_date(args.date)
@@ -104,48 +113,100 @@ def cmd_calculate(args: argparse.Namespace) -> None:
 
     tst_enabled = False
     tst_delta = 0.0
-    if args.birth_json:
-        # BirthProfile: only when true_solar_time is explicitly requested
-        apply_tst = prefer_true_solar and timezone is not None and longitude is not None
-    else:
-        # Legacy CLI: both flags imply true solar time
-        apply_tst = timezone is not None and longitude is not None
-    if apply_tst:
-        try:
-            birth, hi, mi, tst_enabled, tst_delta = resolve_birth_datetime(
-                birth, hi, mi, timezone, longitude  # type: ignore[arg-type]
-            )
-        except Exception as exc:
+    if birth is not None:
+        if args.birth_json:
+            apply_tst = prefer_true_solar and timezone is not None and longitude is not None
+        else:
+            apply_tst = timezone is not None and longitude is not None
+        if apply_tst:
+            try:
+                birth, hi, mi, tst_enabled, tst_delta = resolve_birth_datetime(
+                    birth, hi, mi, timezone, longitude  # type: ignore[arg-type]
+                )
+            except Exception as exc:
+                print(
+                    json.dumps(
+                        {"warning": f"True solar time failed, using clock time: {exc}"},
+                        ensure_ascii=False,
+                    ),
+                    file=sys.stderr,
+                )
+        elif prefer_true_solar and (timezone is None or longitude is None):
             print(
                 json.dumps(
-                    {"warning": f"True solar time failed, using clock time: {exc}"},
+                    {
+                        "warning": (
+                            "true_solar_time requested but timezone/longitude missing; "
+                            "using clock time"
+                        )
+                    },
                     ensure_ascii=False,
                 ),
                 file=sys.stderr,
             )
-    elif prefer_true_solar and (timezone is None or longitude is None):
-        print(
-            json.dumps(
-                {
-                    "warning": (
-                        "true_solar_time requested but timezone/longitude missing; "
-                        "using clock time"
-                    )
-                },
-                ensure_ascii=False,
-            ),
-            file=sys.stderr,
-        )
 
-    out = compute_bazi(
-        birth,
-        hi,
-        mi,
-        true_solar_enabled=tst_enabled,
-        true_solar_delta_minutes=tst_delta,
-        timezone=timezone,
-        calendar_engine="builtin",
-    )
+    engine = args.calendar_engine or "builtin"
+
+    try:
+        if args.calendar_basis:
+            basis = _load_json_arg(args.calendar_basis)
+            hour_arg = args.hour if args.hour is not None else args.hour_interval
+            if birth is not None:
+                out = compute_bazi_from_calendar_basis(
+                    basis,
+                    birth_date=birth,
+                    hour=hi,
+                    minute=mi,
+                    timezone=timezone,
+                    true_solar_enabled=tst_enabled,
+                    true_solar_delta_minutes=tst_delta,
+                )
+            else:
+                out = compute_bazi_from_calendar_basis(
+                    basis,
+                    birth_date=None,
+                    hour=hour_arg,
+                    minute=args.minute if hour_arg is not None or args.minute else None,
+                    timezone=timezone,
+                    true_solar_enabled=tst_enabled,
+                    true_solar_delta_minutes=tst_delta,
+                )
+        elif engine == "lunar":
+            if birth is None:
+                _print_error("--date or --birth-json is required for calendar_engine=lunar")
+            if not timezone:
+                _print_error("calendar_engine=lunar requires --timezone (IANA)")
+            out = compute_bazi_with_lunar(
+                birth,
+                hi,
+                mi,
+                timezone=timezone,
+                true_solar_enabled=tst_enabled,
+                true_solar_delta_minutes=tst_delta,
+            )
+        elif engine == "builtin":
+            if birth is None:
+                _print_error("--date or --birth-json is required for calendar_engine=builtin")
+            out = compute_bazi(
+                birth,
+                hi,
+                mi,
+                true_solar_enabled=tst_enabled,
+                true_solar_delta_minutes=tst_delta,
+                timezone=timezone,
+                calendar_engine="builtin",
+            )
+        elif engine == "external_basis":
+            _print_error(
+                "calendar_engine=external_basis requires --calendar-basis JSON"
+            )
+        else:
+            _print_error(f"unknown calendar_engine: {engine!r}")
+    except CalendarEngineError as exc:
+        _print_error(str(exc))
+    except Exception as exc:
+        _print_error(str(exc))
+
     _print_json(out)
 
 
@@ -185,7 +246,7 @@ def build_parser() -> argparse.ArgumentParser:
         "--date",
         required=False,
         default=None,
-        help="Birth date YYYY-MM-DD (required unless --birth-json)",
+        help="Birth date YYYY-MM-DD (required unless --birth-json or --calendar-basis)",
     )
     p_calc.add_argument("--hour", type=int, default=None, help="Birth hour 0-23")
     p_calc.add_argument(
@@ -199,7 +260,7 @@ def build_parser() -> argparse.ArgumentParser:
         "--timezone",
         type=str,
         default=None,
-        help="IANA timezone for true solar time (e.g. Asia/Shanghai)",
+        help="IANA timezone for true solar time / lunar engine (e.g. Asia/Shanghai)",
     )
     p_calc.add_argument(
         "--longitude",
@@ -214,6 +275,25 @@ def build_parser() -> argparse.ArgumentParser:
         help=(
             "BirthProfile JSON (mystilink.birth/0.1): file path, '-' for stdin, "
             "or inline JSON. Overrides --date/--hour/--minute when set."
+        ),
+    )
+    p_calc.add_argument(
+        "--calendar-engine",
+        type=str,
+        default="builtin",
+        choices=["builtin", "lunar", "external_basis"],
+        help=(
+            "Pillar source: builtin (default), lunar (optional extra), "
+            "or external_basis (use with --calendar-basis)"
+        ),
+    )
+    p_calc.add_argument(
+        "--calendar-basis",
+        type=str,
+        default=None,
+        help=(
+            "External calendar-basis / mystilink-lunar convert JSON "
+            "(file, '-', or inline). Does not import lunar. Sets engine to external_basis."
         ),
     )
     p_calc.set_defaults(func=cmd_calculate)

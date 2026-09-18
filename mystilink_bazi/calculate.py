@@ -227,7 +227,11 @@ def hour_minute_to_shichen(hour: int, minute: int = 0) -> int:
     return ((total + 60) % 1440) // 120
 
 
-def compute_bazi(
+def assemble_bazi_chart(
+    year_p: Pillar,
+    month_p: Pillar,
+    day_p: Pillar,
+    hour_p: Pillar,
     birth_date: date,
     hour_interval: int,
     minute: int = 0,
@@ -236,21 +240,13 @@ def compute_bazi(
     true_solar_delta_minutes: float = 0.0,
     timezone: Optional[str] = None,
     calendar_engine: str = "builtin",
+    calendar_basis: Optional[Dict[str, Any]] = None,
 ) -> Dict[str, Any]:
-    """Compute four pillars from (possibly true-solar-corrected) date/hour/minute."""
+    """Assemble the standard BaZi JSON chart from four pillars."""
     hi = hour_interval
     if hi < 0 or hi > 23:
         hi = 11
     mi = max(0, min(59, minute))
-
-    year_p = calculate_year_pillar(birth_date)
-    month_p = calculate_month_pillar(birth_date, year_p)
-    day_p = calculate_day_pillar(birth_date, hi)
-
-    shichen_index = hour_minute_to_shichen(hi, mi)
-    shichen_branch = EARTHLY_BRANCHES[shichen_index]
-    hour_stems = HOUR_STEM_RULES[day_p.stem]
-    hour_p = Pillar(hour_stems[shichen_index], shichen_branch)
 
     ganzhi_line = (
         f"{year_p.stem}{year_p.branch} {month_p.stem}{month_p.branch} "
@@ -310,14 +306,13 @@ def compute_bazi(
             {"item": "八字时柱-地支", "value": hour_p.branch},
         ],
     }
+    if calendar_basis is not None:
+        out["calendar_basis"] = calendar_basis
     if timezone:
         out["birth"] = {
-            "datetime": (
-                f"{birth_date.isoformat()}T{hi:02d}:{mi:02d}:00"
-            ),
+            "datetime": f"{birth_date.isoformat()}T{hi:02d}:{mi:02d}:00",
             "timezone": timezone,
         }
-        # Prefer offset-aware ISO when timezone is known
         try:
             local = datetime(
                 birth_date.year,
@@ -331,6 +326,61 @@ def compute_bazi(
         except Exception:
             pass
     return out
+
+
+def pillar_from_ganzhi_fields(data: Dict[str, Any]) -> Pillar:
+    """Build a Pillar from a Ganzhi-shaped dict (stem/branch required)."""
+    stem = data.get("stem")
+    branch = data.get("branch")
+    if not stem or not branch:
+        text = data.get("text") or data.get("ganzhi")
+        if isinstance(text, str) and len(text) >= 2:
+            stem, branch = text[0], text[1]
+        else:
+            raise ValueError("pillar requires stem/branch or text")
+    return Pillar(str(stem), str(branch))
+
+
+def compute_bazi(
+    birth_date: date,
+    hour_interval: int,
+    minute: int = 0,
+    *,
+    true_solar_enabled: bool = False,
+    true_solar_delta_minutes: float = 0.0,
+    timezone: Optional[str] = None,
+    calendar_engine: str = "builtin",
+    calendar_basis: Optional[Dict[str, Any]] = None,
+) -> Dict[str, Any]:
+    """Compute four pillars from (possibly true-solar-corrected) date/hour/minute."""
+    hi = hour_interval
+    if hi < 0 or hi > 23:
+        hi = 11
+    mi = max(0, min(59, minute))
+
+    year_p = calculate_year_pillar(birth_date)
+    month_p = calculate_month_pillar(birth_date, year_p)
+    day_p = calculate_day_pillar(birth_date, hi)
+
+    shichen_index = hour_minute_to_shichen(hi, mi)
+    shichen_branch = EARTHLY_BRANCHES[shichen_index]
+    hour_stems = HOUR_STEM_RULES[day_p.stem]
+    hour_p = Pillar(hour_stems[shichen_index], shichen_branch)
+
+    return assemble_bazi_chart(
+        year_p,
+        month_p,
+        day_p,
+        hour_p,
+        birth_date,
+        hi,
+        mi,
+        true_solar_enabled=true_solar_enabled,
+        true_solar_delta_minutes=true_solar_delta_minutes,
+        timezone=timezone,
+        calendar_engine=calendar_engine,
+        calendar_basis=calendar_basis,
+    )
 
 
 def resolve_birth_datetime(

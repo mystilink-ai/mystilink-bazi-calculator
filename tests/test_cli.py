@@ -60,4 +60,38 @@ def test_cli_version() -> None:
     proc = _run("version")
     assert proc.returncode == 0, proc.stderr
     data = json.loads(proc.stdout)
-    assert data["version"] == "0.2.0"
+    assert data["version"] == "0.2.1"
+
+
+def test_cli_calendar_basis() -> None:
+    path = FIXTURES / "calendar.basis.v0.json"
+    proc = _run("calculate", "--calendar-basis", str(path))
+    assert proc.returncode == 0, proc.stderr
+    data = json.loads(proc.stdout)
+    assert data["calendar_engine"] == "external_basis"
+    assert data["pillars"]["year"]["text"] == "庚午"
+
+
+def test_cli_lunar_missing_or_runs() -> None:
+    from mystilink_bazi.calendar_engine import lunar_available
+
+    proc = _run(
+        "calculate",
+        "--date",
+        "1990-05-15",
+        "--hour",
+        "12",
+        "--timezone",
+        "Asia/Shanghai",
+        "--calendar-engine",
+        "lunar",
+    )
+    if lunar_available():
+        assert proc.returncode == 0, proc.stderr
+        data = json.loads(proc.stdout)
+        assert data["calendar_engine"] == "lunar"
+        assert "calendar_basis" in data
+    else:
+        assert proc.returncode != 0
+        err = json.loads(proc.stderr)
+        assert "mystilink-lunar" in err["error"]
