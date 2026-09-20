@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.2.3
+
+- CLI `calculate --envelope` / `--locale` wraps chart as mystilink.envelope/0.1
+- Default stdout remains bare chart JSON
+
 ## 0.2.2
 
 - Primary CLI entry point is `bazi`; alias `mystilink-bazi` remains installed

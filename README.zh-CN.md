@@ -131,6 +131,9 @@ bazi calculate --birth-json tests/fixtures/birth.profile.v0.json
 bazi calculate --calendar-basis tests/fixtures/calendar.basis.v0.json
 ```
 
+
+可选 `--envelope` 将结果包装为 `mystilink.envelope/0.1`（默认仍为裸 JSON）。
+
 ## 限制
 
 - 大运起运所用节气日期为公历近似日，非天文精密历。

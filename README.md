@@ -131,6 +131,9 @@ bazi calculate --birth-json tests/fixtures/birth.profile.v0.json
 bazi calculate --calendar-basis tests/fixtures/calendar.basis.v0.json
 ```
 
+
+Optional `--envelope` wraps the result as `mystilink.envelope/0.1` (default remains bare JSON).
+
 ## Limits
 
 - Solar-term dates for DaYun start-age use approximate civil calendar days, not ephemeris precision.

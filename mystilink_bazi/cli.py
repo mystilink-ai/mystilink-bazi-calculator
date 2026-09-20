@@ -18,9 +18,10 @@ from mystilink_bazi.calendar_engine import (
 )
 from mystilink_bazi.dayun import compute_dayun
 from mystilink_bazi.liunian import compute_liunian
+from mystilink_bazi.envelope import build_subject, structured_error, wrap_envelope
 
 PACKAGE_NAME = "mystilink-bazi-calculator"
-FALLBACK_VERSION = "0.2.2"
+FALLBACK_VERSION = "0.2.3"
 
 
 def get_version() -> str:
@@ -34,8 +35,11 @@ def _print_json(data: Any) -> None:
     print(json.dumps(data, ensure_ascii=False, indent=2))
 
 
-def _print_error(message: str, code: int = 1) -> None:
-    print(json.dumps({"error": message}, ensure_ascii=False), file=sys.stderr)
+def _print_error(message: str, code: int = 1, *, envelope: bool = False) -> None:
+    if envelope:
+        print(json.dumps(structured_error("error", message), ensure_ascii=False), file=sys.stderr)
+    else:
+        print(json.dumps({"error": message}, ensure_ascii=False), file=sys.stderr)
     raise SystemExit(code)
 
 
@@ -203,10 +207,42 @@ def cmd_calculate(args: argparse.Namespace) -> None:
         else:
             _print_error(f"unknown calendar_engine: {engine!r}")
     except CalendarEngineError as exc:
-        _print_error(str(exc))
+        _print_error(str(exc), envelope=bool(getattr(args, "envelope", False)))
     except Exception as exc:
-        _print_error(str(exc))
+        _print_error(str(exc), envelope=bool(getattr(args, "envelope", False)))
 
+    if getattr(args, "envelope", False):
+        profile = None
+        if args.birth_json:
+            try:
+                profile = _load_json_arg(args.birth_json)
+            except Exception:
+                profile = None
+        dt_iso = None
+        if birth is not None:
+            from datetime import datetime as _dt
+            from zoneinfo import ZoneInfo as _ZI
+            if timezone:
+                try:
+                    dt_iso = _dt(birth.year, birth.month, birth.day, hi, mi, tzinfo=_ZI(timezone)).isoformat()
+                except Exception:
+                    dt_iso = f"{birth.isoformat()}T{hi:02d}:{mi:02d}:00"
+            else:
+                dt_iso = f"{birth.isoformat()}T{hi:02d}:{mi:02d}:00"
+        subject = build_subject(
+            birth_profile=profile if isinstance(profile, dict) else None,
+            datetime_iso=dt_iso,
+            timezone_name=timezone,
+            longitude=longitude,
+        )
+        out = wrap_envelope(
+            system="bazi",
+            chart=out,
+            subject=subject,
+            calendar_basis=out.get("calendar_basis"),
+            locale=getattr(args, "locale", None),
+            produced_by=f"{PACKAGE_NAME}@{get_version()}",
+        )
     _print_json(out)
 
 
@@ -296,6 +332,12 @@ def build_parser() -> argparse.ArgumentParser:
             "(file, '-', or inline). Does not import lunar. Sets engine to external_basis."
         ),
     )
+    p_calc.add_argument(
+        "--envelope",
+        action="store_true",
+        help="Wrap chart as mystilink.envelope/0.1 (default: bare chart JSON)",
+    )
+    p_calc.add_argument("--locale", type=str, default=None, help="BCP 47 locale for envelope")
     p_calc.set_defaults(func=cmd_calculate)
 
     p_dayun = sub.add_parser("dayun", help="Compute decade fortune periods")
