@@ -60,7 +60,8 @@ def test_cli_version() -> None:
     proc = _run("version")
     assert proc.returncode == 0, proc.stderr
     data = json.loads(proc.stdout)
-    assert data["version"] == "0.2.1"
+    assert data["version"] == "0.2.2"
+    assert data["cli"] == "bazi"
 
 
 def test_cli_calendar_basis() -> None:

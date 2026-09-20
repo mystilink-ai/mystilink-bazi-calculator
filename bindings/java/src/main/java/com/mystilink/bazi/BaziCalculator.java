@@ -18,7 +18,7 @@ public final class BaziCalculator {
         if (env != null && !env.isBlank()) {
             return env;
         }
-        return "mystilink-bazi";
+        return "bazi";
     }
 
     public static String run(String... args) throws Exception {
@@ -48,7 +48,7 @@ public final class BaziCalculator {
         if (code != 0) {
             String msg = stderr.length() > 0 ? stderr.toString() : stdout.toString();
             if (msg.isBlank()) {
-                msg = "mystilink-bazi exited with code " + code;
+                msg = "bazi exited with code " + code;
             }
             throw new IllegalStateException(msg.trim());
         }

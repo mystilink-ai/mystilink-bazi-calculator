@@ -13,7 +13,7 @@ namespace Mystilink.Bazi
         public static string ResolveCli()
         {
             var env = Environment.GetEnvironmentVariable("MYSTILINK_BAZI_CLI");
-            return string.IsNullOrWhiteSpace(env) ? "mystilink-bazi" : env;
+            return string.IsNullOrWhiteSpace(env) ? "bazi" : env;
         }
 
         public static string Run(params string[] args)
@@ -34,7 +34,7 @@ namespace Mystilink.Bazi
             }
 
             using var proc = Process.Start(psi)
-                ?? throw new InvalidOperationException("Failed to start mystilink-bazi");
+                ?? throw new InvalidOperationException("Failed to start bazi");
             string stdout = proc.StandardOutput.ReadToEnd();
             string stderr = proc.StandardError.ReadToEnd();
             proc.WaitForExit();
@@ -43,7 +43,7 @@ namespace Mystilink.Bazi
                 var msg = string.IsNullOrWhiteSpace(stderr) ? stdout : stderr;
                 throw new InvalidOperationException(
                     string.IsNullOrWhiteSpace(msg)
-                        ? $"mystilink-bazi exited with code {proc.ExitCode}"
+                        ? $"bazi exited with code {proc.ExitCode}"
                         : msg.Trim());
             }
             return stdout;

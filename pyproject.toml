@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "mystilink-bazi-calculator"
-version = "0.2.1"
+version = "0.2.2"
 description = "BaZi (Four Pillars) calculator with dayun and liunian JSON CLI"
 readme = "README.md"
 license = { text = "MIT" }
@@ -25,7 +25,9 @@ dependencies = []
 lunar = ["mystilink-lunar>=0.1.0a3"]
 
 [project.scripts]
+bazi = "mystilink_bazi.cli:main"
 mystilink-bazi = "mystilink_bazi.cli:main"
+
 
 [tool.setuptools.packages.find]
 include = ["mystilink_bazi*"]

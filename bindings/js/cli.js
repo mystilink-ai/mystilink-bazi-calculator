@@ -3,11 +3,11 @@
 const { spawnSync } = require('child_process');
 
 /**
- * Resolve CLI path: MYSTILINK_BAZI_CLI env, else `mystilink-bazi` on PATH.
+ * Resolve CLI path: MYSTILINK_BAZI_CLI env, else `bazi` on PATH (alias: mystilink-bazi).
  * @returns {string}
  */
 function resolveCli() {
-  return process.env.MYSTILINK_BAZI_CLI || 'mystilink-bazi';
+  return process.env.MYSTILINK_BAZI_CLI || 'bazi';
 }
 
 /**
@@ -27,7 +27,7 @@ function runCli(args, opts = {}) {
   }
   if (result.status !== 0) {
     const errText = (result.stderr || result.stdout || '').trim();
-    throw new Error(errText || `mystilink-bazi exited with code ${result.status}`);
+    throw new Error(errText || `bazi exited with code ${result.status}`);
   }
   return JSON.parse(result.stdout);
 }

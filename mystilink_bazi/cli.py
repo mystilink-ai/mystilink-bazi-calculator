@@ -20,7 +20,7 @@ from mystilink_bazi.dayun import compute_dayun
 from mystilink_bazi.liunian import compute_liunian
 
 PACKAGE_NAME = "mystilink-bazi-calculator"
-FALLBACK_VERSION = "0.2.1"
+FALLBACK_VERSION = "0.2.2"
 
 
 def get_version() -> str:
@@ -231,12 +231,12 @@ def cmd_liunian(args: argparse.Namespace) -> None:
 
 
 def cmd_version(_: argparse.Namespace) -> None:
-    _print_json({"name": PACKAGE_NAME, "version": get_version(), "cli": "mystilink-bazi"})
+    _print_json({"name": PACKAGE_NAME, "version": get_version(), "cli": "bazi"})
 
 
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
-        prog="mystilink-bazi",
+        prog="bazi",
         description="BaZi four pillars, dayun, and liunian calculator (JSON stdout).",
     )
     sub = parser.add_subparsers(dest="command", required=True)

@@ -10,14 +10,14 @@ Compute Chinese BaZi (Four Pillars) charts, decade fortunes (DaYun), and annual 
 
 | Target | Delivery |
 |--------|----------|
-| Python | Installable package `mystilink-bazi-calculator` and CLI `mystilink-bazi` |
+| Python | Installable package `mystilink-bazi-calculator` and CLI `bazi` |
 | JavaScript / Node | npm package under `bindings/js` (spawns CLI; browser via injectable `runCli`) |
 | C | Header + library that invokes the CLI and returns JSON |
 | C++ | Thin wrapper over the C API |
 | C# | Process wrapper over the CLI |
 | Java | ProcessBuilder wrapper over the CLI |
 
-All non-Python bindings call the `mystilink-bazi` executable on `PATH` (or `MYSTILINK_BAZI_CLI`).
+All non-Python bindings call the `bazi` executable on `PATH` (or `MYSTILINK_BAZI_CLI`). The long alias `mystilink-bazi` remains installed for compatibility.
 
 ## Requirements
 
@@ -30,11 +30,11 @@ All non-Python bindings call the `mystilink-bazi` executable on `PATH` (or `MYST
 # after obtaining the repository locally
 cd mystilink-bazi-calculator
 python3 -m pip install -e .
-mystilink-bazi calculate --date 1990-05-15 --hour 12
+bazi calculate --date 1990-05-15 --hour 12
 
 # optional lunar engine (Python 3.10+)
 python3 -m pip install -e '.[lunar]'
-mystilink-bazi calculate --date 1990-05-15 --hour 12 --timezone Asia/Shanghai --calendar-engine lunar
+bazi calculate --date 1990-05-15 --hour 12 --timezone Asia/Shanghai --calendar-engine lunar
 ```
 
 Also:
@@ -48,13 +48,13 @@ python3 -m mystilink_bazi calculate --date 1990-05-15 --hour 12
 Always prints JSON to stdout on success.
 
 ```bash
-mystilink-bazi calculate --date YYYY-MM-DD [--hour N] [--minute N] [--timezone IANA] [--longitude N]
-mystilink-bazi calculate --birth-json path/or/-/inline.json
-mystilink-bazi calculate --calendar-basis path/or/-/basis.json
-mystilink-bazi calculate --date YYYY-MM-DD --hour N --timezone IANA --calendar-engine lunar
-mystilink-bazi dayun --date YYYY-MM-DD --gender male|female [--count N]
-mystilink-bazi liunian --year YYYY [--day-stem STEM] [--pillars-json JSON]
-mystilink-bazi version
+bazi calculate --date YYYY-MM-DD [--hour N] [--minute N] [--timezone IANA] [--longitude N]
+bazi calculate --birth-json path/or/-/inline.json
+bazi calculate --calendar-basis path/or/-/basis.json
+bazi calculate --date YYYY-MM-DD --hour N --timezone IANA --calendar-engine lunar
+bazi dayun --date YYYY-MM-DD --gender male|female [--count N]
+bazi liunian --year YYYY [--day-stem STEM] [--pillars-json JSON]
+bazi version
 ```
 
 ### calculate
@@ -127,8 +127,8 @@ Schemas for CLI JSON shapes are in `schema/`. Samples:
 - Calendar basis: `tests/fixtures/calendar.basis.v0.json`
 
 ```bash
-mystilink-bazi calculate --birth-json tests/fixtures/birth.profile.v0.json
-mystilink-bazi calculate --calendar-basis tests/fixtures/calendar.basis.v0.json
+bazi calculate --birth-json tests/fixtures/birth.profile.v0.json
+bazi calculate --calendar-basis tests/fixtures/calendar.basis.v0.json
 ```
 
 ## Limits

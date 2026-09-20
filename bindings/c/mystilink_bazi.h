@@ -6,12 +6,12 @@ extern "C" {
 #endif
 
 /**
- * Run mystilink-bazi with argc/argv-style arguments (excluding program name).
+ * Run bazi with argc/argv-style arguments (excluding program name).
  * On success, returns a heap-allocated JSON string (caller must free with
  * mystilink_bazi_free). On failure, returns NULL and optionally writes an
  * error message into errbuf (if errbuf and errbuf_len are provided).
  *
- * CLI path: environment MYSTILINK_BAZI_CLI, else "mystilink-bazi".
+ * CLI path: environment MYSTILINK_BAZI_CLI, else "bazi" (alias mystilink-bazi).
  */
 char *mystilink_bazi_run(int argc, const char *const *argv, char *errbuf, int errbuf_len);
 

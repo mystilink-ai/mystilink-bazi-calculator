@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.2.2
+
+- Primary CLI entry point is `bazi`; alias `mystilink-bazi` remains installed
+- Bindings default to spawning `bazi` (override with `MYSTILINK_BAZI_CLI`)
+
+
+## 0.2.2
+
+- Primary CLI command is now `bazi` (long alias `mystilink-bazi` still installed)
+- Bindings default to resolving `bazi` on `PATH`
+
 ## 0.2.1
 
 - Optional `[lunar]` extra (`mystilink-lunar>=0.1.0a3`, Python 3.10+)

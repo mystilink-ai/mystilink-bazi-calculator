@@ -10,14 +10,14 @@
 
 | 目标 | 交付 |
 |------|------|
-| Python | 可安装包 `mystilink-bazi-calculator` 与 CLI `mystilink-bazi` |
+| Python | 可安装包 `mystilink-bazi-calculator` 与 CLI `bazi` |
 | JavaScript / Node | `bindings/js` 下的 npm 包（调用 CLI；浏览器通过可注入的 `runCli`） |
 | C | 头文件 + 库，调用 CLI 并返回 JSON 字符串 |
 | C++ | 对 C API 的薄封装 |
 | C# | 通过进程启动 CLI |
 | Java | 通过 ProcessBuilder 启动 CLI |
 
-除 Python 外，绑定均调用 `PATH` 上的 `mystilink-bazi`（或环境变量 `MYSTILINK_BAZI_CLI`）。
+除 Python 外，绑定均调用 `PATH` 上的 `bazi`（或环境变量 `MYSTILINK_BAZI_CLI`）。长别名 `mystilink-bazi` 仍会安装以保持兼容。
 
 ## 环境要求
 
@@ -30,11 +30,11 @@
 # 在本地获取仓库之后
 cd mystilink-bazi-calculator
 python3 -m pip install -e .
-mystilink-bazi calculate --date 1990-05-15 --hour 12
+bazi calculate --date 1990-05-15 --hour 12
 
 # 可选 lunar 引擎（Python 3.10+）
 python3 -m pip install -e '.[lunar]'
-mystilink-bazi calculate --date 1990-05-15 --hour 12 --timezone Asia/Shanghai --calendar-engine lunar
+bazi calculate --date 1990-05-15 --hour 12 --timezone Asia/Shanghai --calendar-engine lunar
 ```
 
 也可：
@@ -48,13 +48,13 @@ python3 -m mystilink_bazi calculate --date 1990-05-15 --hour 12
 成功时向标准输出打印 JSON。
 
 ```bash
-mystilink-bazi calculate --date YYYY-MM-DD [--hour N] [--minute N] [--timezone IANA] [--longitude N]
-mystilink-bazi calculate --birth-json path/or/-/inline.json
-mystilink-bazi calculate --calendar-basis path/or/-/basis.json
-mystilink-bazi calculate --date YYYY-MM-DD --hour N --timezone IANA --calendar-engine lunar
-mystilink-bazi dayun --date YYYY-MM-DD --gender male|female [--count N]
-mystilink-bazi liunian --year YYYY [--day-stem STEM] [--pillars-json JSON]
-mystilink-bazi version
+bazi calculate --date YYYY-MM-DD [--hour N] [--minute N] [--timezone IANA] [--longitude N]
+bazi calculate --birth-json path/or/-/inline.json
+bazi calculate --calendar-basis path/or/-/basis.json
+bazi calculate --date YYYY-MM-DD --hour N --timezone IANA --calendar-engine lunar
+bazi dayun --date YYYY-MM-DD --gender male|female [--count N]
+bazi liunian --year YYYY [--day-stem STEM] [--pillars-json JSON]
+bazi version
 ```
 
 ### calculate
@@ -127,8 +127,8 @@ CLI JSON 结构说明见 `schema/`。样例：
 - Calendar basis：`tests/fixtures/calendar.basis.v0.json`
 
 ```bash
-mystilink-bazi calculate --birth-json tests/fixtures/birth.profile.v0.json
-mystilink-bazi calculate --calendar-basis tests/fixtures/calendar.basis.v0.json
+bazi calculate --birth-json tests/fixtures/birth.profile.v0.json
+bazi calculate --calendar-basis tests/fixtures/calendar.basis.v0.json
 ```
 
 ## 限制

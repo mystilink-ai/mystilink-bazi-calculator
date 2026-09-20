@@ -14,7 +14,7 @@
 
 static const char *cli_path(void) {
     const char *env = getenv("MYSTILINK_BAZI_CLI");
-    return (env && env[0]) ? env : "mystilink-bazi";
+    return (env && env[0]) ? env : "bazi";
 }
 
 static void set_err(char *errbuf, int errbuf_len, const char *msg) {
@@ -144,7 +144,7 @@ char *mystilink_bazi_run(int argc, const char *const *argv, char *errbuf, int er
     FILE *fp = POPEN(cmd, "r");
     free(cmd);
     if (!fp) {
-        set_err(errbuf, errbuf_len, "failed to start mystilink-bazi");
+        set_err(errbuf, errbuf_len, "failed to start bazi");
         return NULL;
     }
 
@@ -155,7 +155,7 @@ char *mystilink_bazi_run(int argc, const char *const *argv, char *errbuf, int er
         return NULL;
     }
     if (status != 0) {
-        set_err(errbuf, errbuf_len, out[0] ? out : "mystilink-bazi failed");
+        set_err(errbuf, errbuf_len, out[0] ? out : "bazi failed");
         free(out);
         return NULL;
     }
