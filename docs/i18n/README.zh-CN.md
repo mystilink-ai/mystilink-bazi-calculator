@@ -1,6 +1,6 @@
 # Mystilink 八字计算器
 
-> Languages: [English](README.md) | [简体中文](README.zh-CN.md)
+> Languages: [English](../../README.md) | [简体中文](README.zh-CN.md) | [繁體中文](README.zh-TW.md) | [日本語](README.ja.md) | [한국어](README.ko.md) | [Français](README.fr.md) | [Español](README.es.md)
 
 ## 概述
 
@@ -115,7 +115,7 @@ liunian = compute_liunian(2024, day_stem=pillars["pillars"]["day"]["stem"])
 - 可选 lunar：`pip install 'mystilink-bazi-calculator[lunar]'`（需 Python 3.10+）。
 - 无 import 编排：`mystilink-lunar convert ... --json` → `mystilink-bazi calculate --calendar-basis …`。
 - 契约对齐：输出字段对齐 `mystilink.bazi.chart/0.1` / Ganzhi；BirthProfile 输入按 `mystilink.birth/0.1` 字段约定解析。
-- 变更见 [CHANGELOG.md](CHANGELOG.md)。
+- 变更见 [CHANGELOG.md](../../CHANGELOG.md)。
 
 ## 示例
 
@@ -143,7 +143,7 @@ bazi calculate --calendar-basis tests/fixtures/calendar.basis.v0.json
 
 ## 许可
 
-MIT。见 [LICENSE](LICENSE)。
+MIT。见 [LICENSE](../../LICENSE)。
 
 ## 问题反馈
 
