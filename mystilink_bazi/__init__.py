@@ -26,4 +26,4 @@ __all__ = [
     "resolve_birth_datetime",
 ]
 
-__version__ = "0.2.2"
+__version__ = "0.2.4"

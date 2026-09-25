@@ -292,6 +292,7 @@ def assemble_bazi_chart(
             "day": day_p.to_dict(),
             "hour": hour_p.to_dict(),
         },
+        "day_master": day_p.to_dict(),
         "bazi_ganzhi": ganzhi_line,
         "summary_zh": "".join(summary_parts),
         "bazi_grid_cells": build_bazi_grid_cells(stems_branches, slot_labels),

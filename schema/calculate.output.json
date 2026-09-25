@@ -42,6 +42,10 @@
         "hour": { "$ref": "#/$defs/pillar" }
       }
     },
+    "day_master": {
+      "type": "object",
+      "description": "Day pillar Ganzhi (equals pillars.day)"
+    },
     "bazi_ganzhi": { "type": "string" },
     "summary_zh": { "type": "string" },
     "bazi_grid_cells": { "type": "array" },

@@ -60,7 +60,7 @@ def test_cli_version() -> None:
     proc = _run("version")
     assert proc.returncode == 0, proc.stderr
     data = json.loads(proc.stdout)
-    assert data["version"] == "0.2.3"
+    assert data["version"] == "0.2.4"
     assert data["cli"] == "bazi"
 
 

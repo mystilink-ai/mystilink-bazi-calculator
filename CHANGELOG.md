@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.2.4
+
+- `calculate` output includes required-aligned `day_master` (equals day pillar Ganzhi)
+- Test against sibling `mystilink-metaphysics-schema` when present (`tests/test_schema_alignment.py`)
+
 ## 0.2.3
 
 - CLI `calculate --envelope` / `--locale` wraps chart as mystilink.envelope/0.1
